@@ -6,12 +6,9 @@ source /koolshare/scripts/base.sh
 source /koolshare/scripts/ss_base.sh
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 url_main="https://raw.githubusercontent.com/hq450/fancyss/3.0/binaries/ss_rust"
-url_back=""
 DNLD=""
 LINUX_VER=$(uname -r|awk -F"." '{print $1$2}')
-if [ $(uname -m) = "aarch64" ]; then
-  ARCH=arm64
-elif [ "${LINUX_VER}" -ge "41" ];then
+if [ "${LINUX_VER}" -ge "41" ];then
 	ARCH=armv7
 elif [ "${LINUX_VER}" -eq "26" ];then
 	ARCH=armv5
@@ -31,12 +28,12 @@ get_latest_version(){
 			echo_date "获取shadowsocks-rust最新版本信息失败！使用备用服务器检测！"
 			failed_warning
 		fi
-		RVERSION=$(cat /tmp/ssrust_latest_info.txt | sed 's/v//g')
+		RVERSION=$(cat /tmp/ssrust_latest_info.txt)
 		if [ -z "${RVERSION}" ];then
 			RVERSION="0"
 		fi
 		
-		echo_date "检测到shadowsocks-rust最新版本：v${RVERSION}"
+		echo_date "检测到shadowsocks-rust最新版本：${RVERSION}"
 		if [ ! -x "/koolshare/bin/sslocal" ];then
 			echo_date "shadowsocks-rust二进制文件sslocal不存在！开始下载！"
 			CUR_VER="0"
@@ -45,12 +42,12 @@ get_latest_version(){
 			if [ -z "${CUR_VER}" ];then
 				CUR_VER="0"
 			fi
-			echo_date "当前已安装shadowsocks-rust版本：v${CUR_VER}"
+			echo_date "当前已安装shadowsocks-rust版本：${CUR_VER}"
 		fi
-		COMP=$(versioncmp ${CUR_VER} ${RVERSION})
-		if [ "${COMP}" == "1" ];then
-			[ "${CUR_VER}" != "0" ] && echo_date "检测到在线版本和本地版本不同，开始更新sslocal程序..."
-			update_now v${RVERSION}
+
+		if [ "${CUR_VER}" != "${RVERSION}" ];then
+			echo_date "检测到在线版本和本地版本不同，开始更新sslocal程序..."
+			update_now ${RVERSION}
 		else
 			echo_date "检测到本地版本已经是最新，退出更新程序!"
 		fi
@@ -83,14 +80,14 @@ update_now(){
 	fi
 	
 	echo_date "开始下载shadowsocks-rust sslocal程序"
-	wget -4 --no-check-certificate --timeout=20 --tries=1 "${url_main}/$1/sslocal_$ARCH"
+	wget -4 --no-check-certificate --timeout=20 --tries=1 ${url_main}/$1/sslocal_${ARCH}
 	if [ "$?" != "0" ];then
 		echo_date "sslocal下载失败！"
 		sslocal_ok=0
 	else
-	  sslocal_ok=1
 		echo_date "sslocal程序下载成功..."
-		mv "sslocal_${ARCH}" sslocal
+		mv sslocal_${ARCH} sslocal
+		sslocal_ok=1
 	fi
 
 	if [ "${md5sum_ok}" == "1" -a "${sslocal_ok}" == "1" ];then
