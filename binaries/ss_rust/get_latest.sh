@@ -15,11 +15,12 @@ extract_archive() {
 . ../scripts/update_include.sh
 
 make(){
-  set_latest_release_version
+  #set_latest_release_version
+  LATEST_VERSION=1.15.0-alpha.5
   update arm-unknown-linux-musleabi armv5
   # Currently no official stable release for armv7-unknown-linux-musleabihf,
   # should use armv7-unknown-linux-musleabihf for armv7 once there is one.
-  update arm-unknown-linux-musleabihf armv7
+  update armv7-unknown-linux-musleabihf armv7
   update aarch64-unknown-linux-musl arm64
   md5_binaries
   echo -n "v$LATEST_VERSION" > latest.txt

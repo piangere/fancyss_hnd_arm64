@@ -6,4 +6,4 @@ update_binaries:
 	cd binaries && make
 
 build:
-	./build.sh
+	./build_fork.sh
